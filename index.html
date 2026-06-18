@@ -86,7 +86,9 @@
     display:flex; flex-direction:column; min-height:0;
   }
   #panel .ph{ padding:30px 22px; color:var(--ink-soft); font-family:var(--mono); font-size:13px; line-height:1.7}
-  .p-head{padding:16px 20px 12px; border-bottom:1px solid var(--line)}
+  .p-head{padding:16px 38px 12px 20px; border-bottom:1px solid var(--line); position:relative}
+  .panel-x{position:absolute; top:12px; right:14px; border:none; background:none; font-size:24px; line-height:1; cursor:pointer; color:var(--ink-soft); padding:0 4px}
+  .panel-x:hover{color:var(--ink)}
   .p-eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft)}
   .p-title{font-size:21px; font-weight:800; margin:5px 0 10px; line-height:1.15}
   .chips{display:flex; gap:7px; flex-wrap:wrap}
@@ -349,6 +351,12 @@ function moveTip(e){const b=svg.getBoundingClientRect();tip.style.left=(e.client
 function hideTip(){tip.style.opacity=0;}
 
 /* ---------- panel ---------- */
+function clearPanel(){
+  selected=null; dimFilter=null; render();
+  const ph=document.getElementById('panelPlaceholder');
+  const pc=document.getElementById('panelContent');
+  pc.style.display='none'; pc.innerHTML=''; ph.style.display='';
+}
 function selectTech(t){
   selected=t; dimFilter=null; render();
   const ph=document.getElementById('panelPlaceholder');
@@ -359,6 +367,7 @@ function selectTech(t){
     ? `<div class="flags"><div class="fl-h">Review flags</div><ul>${t.flags.map(f=>`<li>${esc(f)}</li>`).join('')}</ul></div>` : '';
   pc.innerHTML=`
     <div class="p-head">
+      <button class="panel-x" data-close="1" title="Close">×</button>
       <div class="p-eyebrow" style="color:${AREA_COLOR[t.area]}">${esc(t.area)}</div>
       <div class="p-title">${esc(t.name)}</div>
       <div class="chips">
@@ -440,6 +449,7 @@ function showStack(grp){
       <span class="z" style="background:${zc}">${esc(t.zone||'—')}</span></button>`;
   }).join('');
   pc.innerHTML=`<div class="p-head">
+      <button class="panel-x" data-close="1" title="Close">×</button>
       <div class="p-eyebrow" style="color:${AREA_COLOR[grp[0].area]}">${esc(grp[0].area)} · overlapping markers</div>
       <div class="p-title">${grp.length} technologies here</div>
       <div class="p-eyebrow" style="text-transform:none;color:var(--ink-soft)">These sit close together on the chart and overlap. Their scores are similar but not identical — pick one to see its scoring.</div>
@@ -479,6 +489,9 @@ function constrainPan(){
 document.getElementById('zin').onclick=()=>{view.k=Math.min(8,view.k*1.3);constrainPan();render();};
 document.getElementById('zout').onclick=()=>{view.k=Math.max(1,view.k/1.3);constrainPan();render();};
 document.getElementById('resetView').onclick=()=>{view={k:1,tx:0,ty:0};render();};
+document.getElementById('panelContent').addEventListener('click',e=>{
+  if(e.target.closest('[data-close]')) clearPanel();
+});
 const infoModal=document.getElementById('infoModal');
 document.getElementById('infoBtn').onclick=()=>{infoModal.style.display='flex';};
 document.getElementById('infoClose').onclick=()=>{infoModal.style.display='none';};
